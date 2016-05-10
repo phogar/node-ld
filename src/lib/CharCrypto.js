@@ -2,10 +2,12 @@
 
 import TEA from './TEA'
 var rotr32 = (a,b)=>((a>>>b)|(a<<(32-b))) >>> 0
-var debug = false
+var debug = true
 export default class CharCrypto {
 	genkey(uid){
-		return new Buffer(this.scramble(uid,3)+this.scramble(uid,4)+this.scramble(uid,5)+this.scramble(uid,6),'hex')
+                var result = new Buffer(this.scramble(uid,3)+this.scramble(uid,4)+this.scramble(uid,5)+this.scramble(uid,6),'hex')
+                if( debug ) { console.log('genkey(' + uid + '): '+ result.toString('hex')) }
+                return result;
 	}
 	encrypt(uid,charid){
 		var tea = new TEA()
@@ -14,6 +16,7 @@ export default class CharCrypto {
 		buf.writeUInt32LE(charid,0)
 		buf.writeUInt32LE(charid,4)
 		var ret = tea.encrypt(buf)
+                if( debug ) { console.log('encrypt(uid:'+uid+',charid:'+charid+'): buf(' + buf.toString('hex')+') result('+ret.toString('hex')+')');}
 		return process.browser?ret.toString('hex'):ret
 
 	}
@@ -37,14 +40,14 @@ export default class CharCrypto {
 	 	uid.copy(base)
 		base[(cnt * 4) - 1] = 0xaa
 		// base[30] = base[31] = 0xAA
-	 	
+	 	if(debug) { console.log("scramble(): base: "+base.toString('hex'))}
 	   	var v2 = 0;
 	 	for (var i = 0; i < cnt; i++) {
 			var v4 = rotr32(v2,25);
 			var v5 = rotr32(v2,10);
 			var b = base.readUInt32LE(i*4)
 			v2 = (b + v4 + v5 - v2) >>> 0;
-			if(debug) { console.log("[%d] %s %s %s %s", i, v4.toString(16), v5.toString(16), b.toString(16), v2.toString(16)); }
+			if(debug) { console.log("scramble(): [%d] %s %s %s %s", i, v4.toString(16), v5.toString(16), b.toString(16), v2.toString(16)); }
 	 	}
 	 
 	 	var b = new Buffer(4)

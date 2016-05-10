@@ -1,3 +1,5 @@
+
+var debug = true
 function flipBytes(buf){
     var out = new Buffer(buf.length)
     for(var i = 0; i<buf.length; i+=4)
@@ -16,7 +18,14 @@ export default class TEA {
         var d1 = buffer.readInt32LE(0)
         var d2 = buffer.readInt32LE(4)
         var keya = [this.key.readUInt32LE(0),this.key.readUInt32LE(4),this.key.readUInt32LE(8),this.key.readUInt32LE(12)]
+
+        if( debug ) {
+            console.log('ecrypt(buffer:' + d1.toString(16) + d2.toString(16) + ', key:'+ keya[0].toString(16) +' '+ keya[1].toString(16)+ ' '+ keya[2].toString(16)+ ' '+keya[3].toString(16)+ ')') 
+        }
+            
         var data = this.encipher([d1,d2],keya)
+        
+            
         buf.writeUInt32LE(data[0],0)
         buf.writeUInt32LE(data[1],4)
         return buf

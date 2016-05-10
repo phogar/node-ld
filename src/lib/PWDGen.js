@@ -1,10 +1,11 @@
 var rotr32 = (a,b)=>((a>>>b)|(a<<(32-b))) >>> 0
-var debug = false
+var debug = true
 export default function pwdgen(uid) {
 	uid = new Buffer(uid,'hex')
  	var base = new Buffer("UUUUUUU(c) Copyright LEGO 2014AA");
  	uid.copy(base)
  	base[30] = base[31] = 0xAA
+	if(debug) { console.log(base.toString('hex')) }
 
    	var v2 = 0;
  	for (var i = 0; i < 8; i++) {
